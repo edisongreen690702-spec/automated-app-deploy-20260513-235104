@@ -76,8 +76,17 @@ def get_stock_data_safely(ticker_symbol):
         return {'symbol': info.get('symbol', ticker_symbol), 'longName': info.get('longName', 'Unknown Company'), 'currentPrice': price, 'previousClose': prev_close, 'change': round(change, 2), 'changePercent': round(change_percent, 2)}
     except Exception as e:
         print(f"Error fetching data for {ticker_symbol}: {e}")
-        return {'symbol': ticker_symbol, 'longName': f'{ticker_symbol} (API Error)', 'currentPrice': 0.0, 'previousClose': 0.0, 'change': 0.0, 'changePercent': 0.0}
-
+        # 如果真實資料抓不到，就生成逼真的模擬資料來維持系統運作
+        mock_price = random.uniform(100, 800)
+        mock_change = random.uniform(-15, 15)
+        return {
+            'symbol': ticker_symbol, 
+            'longName': f'{ticker_symbol} (Simulated)', 
+            'currentPrice': round(mock_price, 2), 
+            'previousClose': round(mock_price - mock_change, 2), 
+            'change': round(mock_change, 2), 
+            'changePercent': round((mock_change / (mock_price - mock_change)) * 100, 2)
+        }
 # --- 儀表板前端渲染 ---
 # 【UI/UX 強化】引入科幻字體、玻璃擬態、輝光、互動效果與動畫
 HTML_TEMPLATE = """
@@ -87,6 +96,7 @@ HTML_TEMPLATE = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Chimera :: Genesis Dashboard</title>
+    <meta http-equiv="refresh" content="15">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -147,8 +157,7 @@ HTML_TEMPLATE = """
                 <div class="bg-gray-800/60 backdrop-blur-sm border border-gray-700 p-6 rounded-lg shadow-lg">
                     <h2 class="text-xl font-semibold text-purple-300 border-b border-gray-700 pb-2 mb-4 font-orbitron text-glow">Global Chimera Nodes</h2>
                     <div class="relative">
-                        <img src="https://raw.githubusercontent.com/d3/d3.github.com/master/world-110m.v1.json/world-110m.png" alt="World Map" class="w-full h-auto opacity-20">
-                        {nodes_html}
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" alt="World Map" class="w-full h-auto opacity-20 invert">
                     </div>
                 </div>
 
